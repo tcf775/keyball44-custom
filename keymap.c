@@ -1,31 +1,8 @@
 // Keyball44 カスタムキーマップ
-// コンボ機能追加版（ホームポジションでマウスクリック）
+// 6レイヤー対応版
 
 #include QMK_KEYBOARD_H
 #include "quantum.h"
-
-// ========================================
-// コンボ定義
-// ========================================
-
-// コンボの識別子
-enum combos {
-    JK_LCLICK,   // J + K = 左クリック
-    KL_RCLICK,   // K + L = 右クリック
-    JL_MCLICK    // J + L = ミドルクリック
-};
-
-// 各コンボのキー組み合わせ
-const uint16_t PROGMEM jk_combo[] = {KC_J, KC_K, COMBO_END};
-const uint16_t PROGMEM kl_combo[] = {KC_K, KC_L, COMBO_END};
-const uint16_t PROGMEM jl_combo[] = {KC_J, KC_L, COMBO_END};
-
-// コンボとアクションのマッピング
-combo_t key_combos[COMBO_COUNT] = {
-    [JK_LCLICK] = COMBO(jk_combo, KC_BTN1),  // 左クリック
-    [KL_RCLICK] = COMBO(kl_combo, KC_BTN2),  // 右クリック
-    [JL_MCLICK] = COMBO(jl_combo, KC_BTN3)   // ミドルクリック
-};
 
 // ========================================
 // レイヤー定義
