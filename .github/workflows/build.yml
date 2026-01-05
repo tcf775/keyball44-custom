@@ -1,6 +1,6 @@
 # Keyball44 ファームウェアビルド用 GitHub Actions
-# 参考: https://note.com/mamelog0103/n/n5a51fcd24f26
-#       https://watasuke.net/blog/article/keyball44-review-after-2m-use/
+# 参考: https://scrapbox.io/self-made-kbds-ja/手元に環境構築せずに_GitHub_Actions_で_QMK_Firmware_をビルドする
+#       https://note.com/mamelog0103/n/n5a51fcd24f26
 name: Build Keyball44 Firmware
 
 on:
@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     - name: Checkout repository
@@ -21,6 +21,11 @@ jobs:
     - name: Clone QMK Firmware (version 0.22.14)
       run: |
         git clone https://github.com/qmk/qmk_firmware.git --depth 1 --recurse-submodules --shallow-submodules -b 0.22.14 ~/qmk_firmware
+
+    - name: Install QMK dependencies
+      run: |
+        cd ~/qmk_firmware
+        ./util/qmk_install.sh
 
     - name: Clone Keyball repository
       run: |
@@ -46,7 +51,7 @@ jobs:
     - name: Build firmware
       run: |
         cd ~/qmk_firmware
-        make SKIP_GIT=yes keyball/keyball44:custom
+        make keyball/keyball44:custom
 
     - name: Copy firmware to workspace
       run: |
