@@ -1,0 +1,50 @@
+# Keyball44 ファームウェアビルド用 GitHub Actions
+name: Build Keyball44 Firmware
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # 手動実行用
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup QMK
+      uses: qmk/setup-qmk@v1
+      with:
+        qmk_version: '1.1.5'
+
+    - name: Build firmware
+      run: |
+        # Keyballリポジトリをクローン
+        git clone --depth 1 https://github.com/Yowkees/keyball.git keyball_repo
+        
+        # QMKファームウェアをクローン
+        qmk setup -y
+        
+        # Keyballをキーボードディレクトリにコピー
+        cp -r keyball_repo/qmk_firmware/keyboards/keyball ~/qmk_firmware/keyboards/
+        
+        # カスタムキーマップをコピー
+        mkdir -p ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/custom
+        cp keymap.c ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/custom/
+        cp config.h ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/custom/
+        cp rules.mk ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/custom/
+        
+        # ビルド実行
+        cd ~/qmk_firmware
+        qmk compile -kb keyball/keyball44 -km custom
+
+    - name: Upload firmware
+      uses: actions/upload-artifact@v4
+      with:
+        name: keyball44_firmware
+        path: ~/qmk_firmware/*.hex
+        if-no-files-found: error

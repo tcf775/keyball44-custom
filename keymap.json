@@ -1,0 +1,67 @@
+{
+  "keyboard": "Keyball44",
+  "layout": "English (US)",
+  "layers": {
+    "layer_0": {
+      "name": "Base Layer",
+      "left_hand": [
+        ["Tab", "Q", "W", "E", "R", "T"],
+        ["Ctrl", "A", "S", "D", "F", "G"],
+        ["Shift", "Z", "X", "C", "V", "B"],
+        ["Layer(1)", "Esc", "Win", "Alt", "Space"]
+      ],
+      "right_hand": [
+        ["Y", "U", "I", "O", "P", "BS"],
+        ["H", "J", "K", "L", ";", "'"],
+        ["N", "M", ",", ".", "/", "Layer(3)"],
+        ["Enter", "BS", "Layer(2)", "Del", "Layer(3)"]
+      ]
+    },
+    "layer_1": {
+      "name": "Numbers / Mouse",
+      "left_hand": [
+        ["", "1", "2", "3", "4", "5"],
+        ["", "", "", "", "", ""],
+        ["", "", "", "", "", ""],
+        ["", "", "", "", ""]
+      ],
+      "right_hand": [
+        ["6", "7", "8", "9", "0", ""],
+        ["Left", "Down", "Up", "Right", "PageUp", "PageDown"],
+        ["Btn1", "Btn2", "Btn3", "", "", ""],
+        ["", "", "", "", ""]
+      ]
+    },
+    "layer_2": {
+      "name": "Symbols",
+      "description": "Image provided shows this layer primarily",
+      "left_hand": [
+        ["", "!", "@", "#", "$", "%"],
+        ["", "", "", "", "", ""],
+        ["", "", "", "", "", ""],
+        ["", "", "", "", ""]
+      ],
+      "right_hand": [
+        ["^", "&", "*", "(", ")", "-"],
+        ["|", "{", "}", "[", "]", "+"],
+        ["<", ">", "?", "", "=", "M"],
+        ["", "", "Del", "", ""]
+      ]
+    },
+    "layer_3": {
+      "name": "Function / RGB / System",
+      "left_hand": [
+        ["", "F1", "F2", "F3", "F4", "F5"],
+        ["", "RGB_Toggle", "RGB_Mode", "RGB_HUE+", "RGB_SAT+", "RGB_BRIGHT+"],
+        ["", "Bootloader", "RGB_Mode-", "RGB_HUE-", "RGB_SAT-", "RGB_BRIGHT-"],
+        ["", "", "", "", ""]
+      ],
+      "right_hand": [
+        ["F6", "F7", "F8", "F9", "F10", "F11"],
+        ["F12", "", "", "", "", ""],
+        ["", "", "", "", "", "REMAP"],
+        ["", "", "", "", ""]
+      ]
+    }
+  }
+}
