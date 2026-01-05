@@ -1,4 +1,6 @@
 # Keyball44 ファームウェアビルド用 GitHub Actions
+# 参考: https://note.com/mamelog0103/n/n5a51fcd24f26
+#       https://watasuke.net/blog/article/keyball44-review-after-2m-use/
 name: Build Keyball44 Firmware
 
 on:
@@ -16,50 +18,45 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-
-    - name: Install QMK CLI and dependencies
+    - name: Clone QMK Firmware (version 0.22.14)
       run: |
-        python -m pip install --upgrade pip
-        pip install qmk
-        sudo apt-get update
-        sudo apt-get install -y gcc-arm-none-eabi avr-libc gcc-avr
-
-    - name: Clone QMK Firmware
-      run: |
-        git clone --depth 1 --recurse-submodules https://github.com/qmk/qmk_firmware.git ~/qmk_firmware
+        git clone https://github.com/qmk/qmk_firmware.git --depth 1 --recurse-submodules --shallow-submodules -b 0.22.14 ~/qmk_firmware
 
     - name: Clone Keyball repository
       run: |
-        git clone --depth 1 https://github.com/Yowkees/keyball.git ~/keyball_repo
+        git clone --depth 1 https://github.com/Yowkees/keyball.git ~/keyball
 
-    - name: Copy Keyball to QMK keyboards
+    - name: Create symbolic link for Keyball
       run: |
-        cp -r ~/keyball_repo/qmk_firmware/keyboards/keyball ~/qmk_firmware/keyboards/
+        ln -s ~/keyball/qmk_firmware/keyboards/keyball ~/qmk_firmware/keyboards/keyball
+        echo "=== Verify symbolic link ==="
+        ls -la ~/qmk_firmware/keyboards/keyball
 
-    - name: Copy custom keymap
+    - name: Copy custom keymap (via base for Remap support)
       run: |
-        mkdir -p ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/custom
+        # viaをベースにカスタムキーマップを作成（Remap対応のため）
+        cp -r ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/via ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/custom
+        # カスタムファイルで上書き
         cp keymap.c ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/custom/
         cp config.h ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/custom/
         cp rules.mk ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/custom/
+        echo "=== Custom keymap files ==="
+        ls -la ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/custom/
 
     - name: Build firmware
       run: |
         cd ~/qmk_firmware
-        make keyball/keyball44:custom
+        make SKIP_GIT=yes keyball/keyball44:custom
 
     - name: Copy firmware to workspace
       run: |
-        find ~/qmk_firmware -name "*.hex" -exec cp {} ./ \;
+        cp ~/qmk_firmware/keyball_keyball44_custom.hex ./
+        echo "=== Built firmware ==="
         ls -la *.hex
 
     - name: Upload firmware
       uses: actions/upload-artifact@v4
       with:
         name: keyball44_firmware
-        path: ./*.hex
+        path: ./keyball_keyball44_custom.hex
         if-no-files-found: error
