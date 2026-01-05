@@ -16,35 +16,47 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup QMK
-      uses: qmk/setup-qmk@v1
+    - name: Setup Python
+      uses: actions/setup-python@v5
       with:
-        qmk_version: '1.1.5'
+        python-version: '3.11'
 
-    - name: Build firmware
+    - name: Install QMK CLI
       run: |
-        # Keyballリポジトリをクローン
-        git clone --depth 1 https://github.com/Yowkees/keyball.git keyball_repo
-        
-        # QMKファームウェアをクローン
+        python -m pip install --upgrade pip
+        pip install qmk
+
+    - name: Setup QMK
+      run: |
         qmk setup -y
-        
-        # Keyballをキーボードディレクトリにコピー
+
+    - name: Clone Keyball repository
+      run: |
+        git clone --depth 1 https://github.com/Yowkees/keyball.git keyball_repo
+
+    - name: Copy Keyball to QMK keyboards
+      run: |
         cp -r keyball_repo/qmk_firmware/keyboards/keyball ~/qmk_firmware/keyboards/
-        
-        # カスタムキーマップをコピー
+
+    - name: Copy custom keymap
+      run: |
         mkdir -p ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/custom
         cp keymap.c ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/custom/
         cp config.h ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/custom/
         cp rules.mk ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/custom/
-        
-        # ビルド実行
+
+    - name: Build firmware
+      run: |
         cd ~/qmk_firmware
         qmk compile -kb keyball/keyball44 -km custom
+
+    - name: Copy firmware to workspace
+      run: |
+        cp ~/qmk_firmware/*.hex ./
 
     - name: Upload firmware
       uses: actions/upload-artifact@v4
       with:
         name: keyball44_firmware
-        path: ~/qmk_firmware/*.hex
+        path: ./*.hex
         if-no-files-found: error
