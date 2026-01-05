@@ -1,6 +1,6 @@
-# Keyball44 ファームウェアビルド用 GitHub Actions
-# 参考: https://filterpaper.github.io/qmk/workflow.html
-name: Build Keyball44 Firmware
+# Keyball44 カスタムファームウェアビルド
+# 公式Yowkees/keyballのワークフローを参考に作成
+name: Build Keyball44 Custom Firmware
 
 on:
   push:
@@ -11,46 +11,52 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    container: qmkfm/base_container
+    name: Build keyball44:custom
+    runs-on: ubuntu-22.04
+    # 公式と同じコンテナイメージを使用（SHA256でピン留め）
+    container:
+      image: ghcr.io/qmk/qmk_cli@sha256:2dc05fc9f32efebd6b05c2b8676ee548358bc7e151e9dbf4dac6b6eed4513b07
 
     steps:
-    - name: Checkout repository
+    - name: Checkout this repository
       uses: actions/checkout@v4
 
-    - name: Clone QMK Firmware (version 0.22.14)
-      run: |
-        git clone https://github.com/qmk/qmk_firmware.git --depth 1 --recurse-submodules --shallow-submodules -b 0.22.14 /qmk_firmware
+    - name: Checkout qmk_firmware
+      uses: actions/checkout@v4
+      with:
+        path: __qmk__
+        repository: qmk/qmk_firmware
+        submodules: recursive
+        ref: '0.22.14'
 
-    - name: Clone Keyball repository
-      run: |
-        git clone --depth 1 https://github.com/Yowkees/keyball.git /keyball
+    - name: Setup QMK
+      run: qmk setup --home __qmk__ --yes
 
-    - name: Create symbolic link for Keyball
+    - name: Clone Keyball source
       run: |
-        ln -s /keyball/qmk_firmware/keyboards/keyball /qmk_firmware/keyboards/keyball
-        ls -la /qmk_firmware/keyboards/keyball
+        git clone --depth 1 https://github.com/Yowkees/keyball.git __keyball__
+        ln -s $(pwd)/__keyball__/qmk_firmware/keyboards/keyball __qmk__/keyboards/keyball
 
-    - name: Copy custom keymap
+    - name: Install missing python modules
+      run: /usr/bin/python3 -m pip install -r __qmk__/requirements.txt
+
+    - name: Create custom keymap
       run: |
-        cp -r /qmk_firmware/keyboards/keyball/keyball44/keymaps/via /qmk_firmware/keyboards/keyball/keyball44/keymaps/custom
-        cp keymap.c /qmk_firmware/keyboards/keyball/keyball44/keymaps/custom/
-        cp config.h /qmk_firmware/keyboards/keyball/keyball44/keymaps/custom/
-        cp rules.mk /qmk_firmware/keyboards/keyball/keyball44/keymaps/custom/
-        ls -la /qmk_firmware/keyboards/keyball/keyball44/keymaps/custom/
+        # viaキーマップをベースにcustomキーマップを作成
+        cp -r __qmk__/keyboards/keyball/keyball44/keymaps/via __qmk__/keyboards/keyball/keyball44/keymaps/custom
+        # カスタムファイルをコピー
+        cp keymap.c __qmk__/keyboards/keyball/keyball44/keymaps/custom/
+        cp config.h __qmk__/keyboards/keyball/keyball44/keymaps/custom/
+        cp rules.mk __qmk__/keyboards/keyball/keyball44/keymaps/custom/
+        # 確認
+        ls -la __qmk__/keyboards/keyball/keyball44/keymaps/custom/
 
     - name: Build firmware
-      run: |
-        cd /qmk_firmware
-        qmk compile -kb keyball/keyball44 -km custom
-
-    - name: Copy firmware to workspace
-      run: |
-        cp /qmk_firmware/keyball_keyball44_custom.hex ./
+      run: qmk compile -j 4 -kb keyball/keyball44 -km custom
 
     - name: Upload firmware
       uses: actions/upload-artifact@v4
       with:
-        name: keyball44_firmware
-        path: ./keyball_keyball44_custom.hex
+        name: keyball44_custom_firmware
+        path: __qmk__/*.hex
         if-no-files-found: error
