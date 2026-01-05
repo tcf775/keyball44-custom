@@ -80,3 +80,20 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     keyball_set_scroll_mode(get_highest_layer(state) == _FN);
     return state;
 }
+
+// ========================================
+// OLED表示設定
+// ========================================
+// Keyball公式のoledkitライブラリを使用
+#ifdef OLED_ENABLE
+#include "lib/oledkit/oledkit.h"
+
+void oledkit_render_info_user(void) {
+    // 押しているキー情報を表示
+    keyball_oled_render_keyinfo();
+    // トラックボール情報（CPI等）を表示
+    keyball_oled_render_ballinfo();
+    // 現在のレイヤー情報を表示
+    keyball_oled_render_layerinfo();
+}
+#endif
