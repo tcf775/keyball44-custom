@@ -16,27 +16,17 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-
-    - name: Install QMK CLI
+    - name: Clone QMK Firmware
       run: |
-        python -m pip install --upgrade pip
-        pip install qmk
-
-    - name: Setup QMK
-      run: |
-        qmk setup -y
+        git clone --depth 1 --recurse-submodules https://github.com/qmk/qmk_firmware.git ~/qmk_firmware
 
     - name: Clone Keyball repository
       run: |
-        git clone --depth 1 https://github.com/Yowkees/keyball.git keyball_repo
+        git clone --depth 1 https://github.com/Yowkees/keyball.git ~/keyball_repo
 
     - name: Copy Keyball to QMK keyboards
       run: |
-        cp -r keyball_repo/qmk_firmware/keyboards/keyball ~/qmk_firmware/keyboards/
+        cp -r ~/keyball_repo/qmk_firmware/keyboards/keyball ~/qmk_firmware/keyboards/
 
     - name: Copy custom keymap
       run: |
@@ -45,14 +35,19 @@ jobs:
         cp config.h ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/custom/
         cp rules.mk ~/qmk_firmware/keyboards/keyball/keyball44/keymaps/custom/
 
+    - name: Setup QMK dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi avr-libc gcc-avr
+
     - name: Build firmware
       run: |
         cd ~/qmk_firmware
-        qmk compile -kb keyball/keyball44 -km custom
+        make keyball/keyball44:custom
 
     - name: Copy firmware to workspace
       run: |
-        cp ~/qmk_firmware/*.hex ./
+        cp ~/qmk_firmware/keyball_keyball44_custom.hex ./ 2>/dev/null || cp ~/qmk_firmware/*.hex ./ 2>/dev/null || echo "Looking for hex files..." && find ~/qmk_firmware -name "*.hex" -exec cp {} ./ \;
 
     - name: Upload firmware
       uses: actions/upload-artifact@v4
