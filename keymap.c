@@ -93,3 +93,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                  _______, _______, _______, _______, _______,                             _______, _______, _______, _______, _______
     )
 };
+
+// ========================================
+// レイヤー切り替え時の処理
+// ========================================
+// レイヤー3（_FN）に切り替えるとトラックボールがスクロールモードになる
+layer_state_t layer_state_set_user(layer_state_t state) {
+    // レイヤー3のときスクロールモードを有効化
+    keyball_set_scroll_mode(get_highest_layer(state) == _FN);
+    return state;
+}
