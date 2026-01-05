@@ -32,9 +32,9 @@ jobs:
     - name: Setup QMK
       run: qmk setup --home __qmk__ --yes
 
-    - name: Clone Keyball source
+    - name: Clone Keyball source (v1.3.2 tag)
       run: |
-        git clone --depth 1 https://github.com/Yowkees/keyball.git __keyball__
+        git clone --depth 1 --branch v1.3.2 https://github.com/Yowkees/keyball.git __keyball__
         ln -s $(pwd)/__keyball__/qmk_firmware/keyboards/keyball __qmk__/keyboards/keyball
 
     - name: Install missing python modules
