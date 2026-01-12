@@ -22,10 +22,12 @@ enum layer_number {
 // ========================================
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    // Layer 0: Base（QWERTY）
+    // Layer 0: Base（QWERTY）+ Home Row Mods（atusyさん方式）
+    // 左手: A=Alt, S=Shift, D=GUI, F=Ctrl
+    // 右手: J=Ctrl, K=GUI, L=Shift, ;=Alt（左手の鏡像）
     [_BASE] = LAYOUT_universal(
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                                KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC,
-        KC_LCTL, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                                KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,
+        KC_ESC,  LALT_T(KC_A), LSFT_T(KC_S), LGUI_T(KC_D), LCTL_T(KC_F), KC_G,            KC_H,    RCTL_T(KC_J), RGUI_T(KC_K), RSFT_T(KC_L), RALT_T(KC_SCLN), KC_QUOT,
         KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                                KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, MO(_FN),
                  MO(_NUM),KC_ESC,  KC_LGUI, KC_LALT, KC_SPC,                              KC_ENT,  KC_BSPC, MO(_SYM),KC_DEL,  MO(_FN)
     ),

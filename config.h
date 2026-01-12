@@ -27,6 +27,12 @@
 
 #define TAP_CODE_DELAY 5
 
+// ========================================
+// Home Row Mods 設定（atusyさん参考）
+// ========================================
+#define TAPPING_TERM 160
+#define PERMISSIVE_HOLD
+
 // 自動マウスレイヤー設定
 #define POINTING_DEVICE_AUTO_MOUSE_ENABLE
 #define AUTO_MOUSE_DEFAULT_LAYER 1
